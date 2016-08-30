@@ -11,7 +11,7 @@ def setupPackage():
     setup(name='qdune',
           version='0.1.0',
           description='dune point cloud processing tools',
-          url='https://github.com/tashley/qDune'
+          url='https://github.com/tashley/qDune',
           author='Thomas Ashley',
           author_email='tashley22@gmail.com',
           license='MIT',
