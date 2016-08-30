@@ -7,28 +7,11 @@ except ImportError:
 
 
 def setupPackage():
-#    setup(name='qDune',
-#          description='dune point cloud processing tools',
-#          classifiers=[
-#              'Intended Audience :: Science/Research',
-#              'Intended Audience :: Developers',
-#              'License :: MIT)',
-#              'Programming Language :: Python',
-#              'Programming Language :: Python :: 3.5',
-#              'Topic :: Scientific/Engineering'],
-#          author='Thomas Ashley',
-#          url = 'URL to get it at.',
-#          author_email='tashley22@gmail.com',
-#          version='1.0',
-#          license='MIT',
-#          packages=['qDune'],
-#          keywords=['dunes', 'bedload'],
-#          platforms='Windows',
-#          package_data={'qDune': ['*.xyz', '*.csv']})
 
     setup(name='qdune',
           version='0.1.0',
           description='dune point cloud processing tools',
+          url='https://github.com/tashley/qDune'
           author='Thomas Ashley',
           author_email='tashley22@gmail.com',
           license='MIT',
