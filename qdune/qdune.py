@@ -17,6 +17,7 @@ class Raw(object):
 
     def __init__(self, datadir):
         """ Instantiates a multibeam raw data object """
+        print('\rStatus: Loading Raw Data', end = "\r")
         self.datadir = datadir
 
         # Load file info and verify data validity
@@ -239,7 +240,7 @@ class Raster(Raw):
         # For every survey
         self.Zarr = np.empty((nt, ny, nx), 'float')
         for i in range(nt):
-
+            print('\rStatus: Gridding Survey {0}/{1}'.format(i, nt), end = "\r")
             # if the raster file already exists:
             if self.rpaths[i] in self.completed:
                 # Load completed raster
@@ -269,7 +270,6 @@ class Raster(Raw):
 
                 # record progress
                 self.completed.append(self.rpaths[i])
-                print('\rCompleted {0}/{1}'.format(i+1, nt), end = "\r")
 
 
     # =========================================================
@@ -400,6 +400,8 @@ class Raster(Raw):
         Lc = np.empty((nt, ny), 'float')
 
         for t in range(nt):
+            print('\rStatus: Calculating Lc and Hc (Survey {0}/{1})'.format(t, nt),
+                  end = "\r")
             for y in range(ny):
                 signal = Zwin[t,y]
                 nans, x = self._nan_helper(signal)
@@ -435,6 +437,7 @@ class Raster(Raw):
         [nt, ny, _] = z.shape
         disp = np.empty((nt, nt, ny), 'float')
         for t1 in range(nt):
+            print('\rStatus: Calculating Bedform Displacements {0}/{1}'.format(t1, nt), end = "\r")
             for t2 in range(nt):
                 for y in range(ny):
                     d, corr = self._xcorrf(z[t1,y], z[t2, y], dx)
@@ -500,6 +503,7 @@ class Raster(Raw):
         Vc = np.empty((nt, ny), 'float')
         r2 = np.empty_like(Vc)
         for t1 in range(nt):
+            print('\rStatus: Performing Velocity Regression {0}/{1}'.format(t1, nt), end = "\r")
             for y in range(ny):
                 d_x = disp[t1,:,y].flatten()
                 d_t = deltat[t1,:].flatten()
