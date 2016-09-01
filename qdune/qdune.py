@@ -17,7 +17,9 @@ class Raw(object):
 
     def __init__(self, datadir):
         """ Instantiates a multibeam raw data object """
+
         print('\rStatus: Verifying Data', end = "\t\t\t\r")
+
         self.datadir = datadir
 
         # Load file info and verify data validity
@@ -437,6 +439,7 @@ class Raster(Raw):
         disp = np.empty((nt, nt, ny), 'float')
         for t1 in range(nt):
             print('\rStatus: Calculating Bedform Displacements {0}/{1}'.format(t1+1, nt), end = "\t\t\t\r")
+
             for t2 in range(nt):
                 for y in range(ny):
                     d, corr = self._xcorrf(z[t1,y], z[t2, y], dx)
