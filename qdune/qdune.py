@@ -3,7 +3,7 @@ Suite of tools for gridding multibeam bathymetric surveys and calculating
 bed form flux.
 
 
-version: 1.0
+version: 0.1.3
 """
 
 import os, glob
@@ -17,6 +17,7 @@ class Raw(object):
 
     def __init__(self, datadir):
         """ Instantiates a multibeam raw data object """
+        print('\rStatus: Verifying Data', end = "\t\t\t\r")
         self.datadir = datadir
 
         # Load file info and verify data validity
@@ -239,13 +240,12 @@ class Raster(Raw):
         # For every survey
         self.Zarr = np.empty((nt, ny, nx), 'float')
         for i in range(nt):
-
+            print('\rStatus: Gridding Survey {0}/{1}'.format(i+1, nt), end = "\t\t\t\r")
             # if the raster file already exists:
             if self.rpaths[i] in self.completed:
                 # Load completed raster
                 self.Zarr[i] = np.load(self.rpaths[i])
 
-                print('\rVerified {0}/{1}'.format(i+1, nt), end="\r")
             else:
                 # Load point clouds
                 xyz = self._rotate_xy(np.loadtxt(self.xyzpaths[i]), flow_azimuth)
@@ -269,7 +269,6 @@ class Raster(Raw):
 
                 # record progress
                 self.completed.append(self.rpaths[i])
-                print('\rCompleted {0}/{1}'.format(i+1, nt), end = "\r")
 
 
     # =========================================================
@@ -400,6 +399,8 @@ class Raster(Raw):
         Lc = np.empty((nt, ny), 'float')
 
         for t in range(nt):
+            print('\rStatus: Calculating Lc and Hc (Survey {0}/{1})'.format(t+1, nt),
+                  end = "\t\t\t\r")
             for y in range(ny):
                 signal = Zwin[t,y]
                 nans, x = self._nan_helper(signal)
@@ -435,6 +436,7 @@ class Raster(Raw):
         [nt, ny, _] = z.shape
         disp = np.empty((nt, nt, ny), 'float')
         for t1 in range(nt):
+            print('\rStatus: Calculating Bedform Displacements {0}/{1}'.format(t1+1, nt), end = "\t\t\t\r")
             for t2 in range(nt):
                 for y in range(ny):
                     d, corr = self._xcorrf(z[t1,y], z[t2, y], dx)
@@ -443,8 +445,6 @@ class Raster(Raw):
                         disp[t1,t2,y] = d
                     else:
                         disp[t1, t2, y] = np.nan
-
-            print("\rCorrelated t1 = {0}/{1}".format(t1+1, nt), end = "\r")
 
         return disp
 
@@ -490,7 +490,6 @@ class Raster(Raw):
                     # fix if not valid
                     if not valid:
                         disp[t1, t2, y] = np.nan
-            print("\rCleaned {0}/{1}".format(t1+1, nt), end = "\r")
 
         return disp
 
@@ -500,6 +499,7 @@ class Raster(Raw):
         Vc = np.empty((nt, ny), 'float')
         r2 = np.empty_like(Vc)
         for t1 in range(nt):
+            print('\rStatus: Performing Velocity Regression {0}/{1}'.format(t1+1, nt), end = "\t\t\t\r")
             for y in range(ny):
                 d_x = disp[t1,:,y].flatten()
                 d_t = deltat[t1,:].flatten()
@@ -511,12 +511,11 @@ class Raster(Raw):
 
                 d_t = d_t[:,np.newaxis]
 
-                if len(d_x) < 4:
+                if len(d_x) < 3:
                     Vc[t1, y] = np.nan
                 else:
                     Vc[t1,y], resid, _, _ = np.linalg.lstsq(d_t, d_x)
                     r2[t1,y] = 1 - resid / (len(d_x) * np.var(d_x))
-            print('\rVelocity Calculated {0}/{1}'.format(t1+1, nt), end = '\r')
         Vc[np.where(r2<r2min)] = np.nan
 
         return Vc

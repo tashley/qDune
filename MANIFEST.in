@@ -1,0 +1,2 @@
+include qdune/testdata/info.csv
+recursive-include qdune/testdata/xyz *.txt

@@ -19,10 +19,14 @@ def dotest():
     Lmax = (iend-istart)*dx/3
     ref_xyz = 0
 
-    qdat = qdune.q(datadir, save, flow_azimuth, dx, dy, istart, iend, Lmax)
+    qobj = qdune.q(datadir, save, flow_azimuth, dx, dy, istart, iend, Lmax)
 
-    flux2d = qdat.Vc * qdat.Hc * 0.5
-    volflux = np.nansum(flux2d,1) * qdat.dy
-    massflux = volflux * 2650 * 0.65
+    flux2d = qobj.Vc * qobj.Hc * 0.5 * 0.65
+    volflux = np.nansum(flux2d,1) * qobj.dy
+    massflux = volflux * 2650
 
-    print('Average Flux = {0} kg/s'.format(np.nanmean(massflux)))
+    correct_result = np.array([0.73350211, 0.83383889, 0.81234798, 0.51997741])
+    assert not np.isnan(massflux).any(), "NaNs found in flux output"
+    assert np.allclose(massflux, correct_result), "Flux calculation incorrect"
+    print('Test Successful.', end='\t\t\t\t\n')
+    return qobj
